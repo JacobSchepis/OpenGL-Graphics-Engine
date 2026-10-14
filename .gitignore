@@ -399,3 +399,5 @@ FodyWeavers.xsd
 
 # my stuff
 /out/
+# CMake build output
+/build/
