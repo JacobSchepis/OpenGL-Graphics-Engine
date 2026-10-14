@@ -1,2 +1,11 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Third-party libraries: exclude from GitHub language stats
+include/GL/** linguist-vendored
+include/SDL/** linguist-vendored
+include/assimp/** linguist-vendored
+include/glm/** linguist-vendored
+include/stb_image.h linguist-vendored
+lib/** linguist-vendored
+dll/** linguist-vendored
