@@ -9,6 +9,10 @@ entity-component system, the renderer, PBR and shadow-mapping shaders, model loa
 camera and input, and the day/night cycle. Teammates contributed the lighting manager, the
 cloud shader and the wind turbine model import. The project received full marks.
 
+The version submitted for assessment is archived, unchanged, at
+[COMP3340GraphicsEngine2](https://github.com/JacobSchepis/COMP3340GraphicsEngine2). This
+repo continues from it, with the full commit history.
+
 <!-- TODO: add a screenshot or GIF of the running scene here -->
 
 ## Features
