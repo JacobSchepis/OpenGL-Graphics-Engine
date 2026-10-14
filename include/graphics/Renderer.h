@@ -1,24 +1,54 @@
 #pragma once
 
 #include <vector>
+#include <unordered_map>
 #include "shaders/Shader.h"
 #include "components/Camera.h"
 #include "components/rendering/Model.h"
+#include "systems/LightingManager.h"
 
 
 class Renderer {
 public:
+	enum ShaderType {
+		PBR = 1 << 0,        // 0001
+		Outline = 1 << 1, // 0010
+		ShadowMap = 1 << 2, // 0100
+		// Add more shaders as needed
+	};
+
 	Renderer();
 	~Renderer();
 
-	void render(Shader* shader);
+	void render();
 
-	void addModel(Model* model);
+	void addModel(Model* model, int shaderType);
+
+	void addLight(Light* light, bool isStatic);
+	void setStaticLights();
 
 	void setActiveCamera(Camera* camera);
 
+	void setupCloud();           // 初始化云层
+	void renderCloud();          // 渲染云层
+
 private:
-	std::vector<Model*> m_Models;
+	GLuint cloudVAO, cloudVBO, cloudEBO;  // 云层的顶点数据
+	Shader* cloudShader;                   // 云层的着色器
+
+	std::unordered_map<Model*, int> objectShaderFlags;
+
+	std::unordered_map<ShaderType, Shader*> flagsToShader = {
+		{ShadowMap, new Shader("shaders/ShadowMap_vert.glsl", "shaders/ShadowMap_frag.glsl")},
+		{PBR, new Shader("shaders/PBR_vert.glsl", "shaders/PBR_frag.glsl")},
+	};
 
 	Camera* activeCamera;
+	LightingManager lightingManager = LightingManager();
+
+	void renderPBR(Model* model);
+	void renderOutline(Model* model);
+	void renderShadowMap(Model* model);
+
+	void setCamera(Shader* shader);
 };

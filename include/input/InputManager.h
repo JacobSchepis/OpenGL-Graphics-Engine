@@ -21,6 +21,10 @@ public:
 
 	glm::vec2& getWasdInputVector();
 
+	int getVerticalInput();
+
+	bool getPressedEscape();
+
 private:
 	InputManager();
 
@@ -30,9 +34,11 @@ private:
 
 	glm::vec2 wasdInputVector;
 	glm::vec2 mouseDelta;
+	int verticalInput;
 
 	void ProcessKeyDownEvent(SDL_Event keysym);
 
 	void ResetInputValues();
 
+	bool pressedEscape;
 };

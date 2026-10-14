@@ -12,16 +12,14 @@
 
 class MeshRenderer {
 public:
-	MeshRenderer();
-	MeshRenderer(Mesh& mesh, std::vector<Texture>& newTextures);
+	MeshRenderer(Mesh& mesh, Material& material);
 	~MeshRenderer();
 
 	void setup();
 
-	void render(Shader* shader);
+	void render();
 
 	Transform transform;
 	Mesh mesh;
-	std::vector<Texture> textures;
-	std::vector<Material> material;
+	Material material;
 };

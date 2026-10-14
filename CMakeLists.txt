@@ -34,17 +34,17 @@ add_executable(COMP3340GraphicsEngine2 ${SOURCES}
 
 "include/entities/Entity.h"                     "src/entities/Entity.cpp" 
 
-"include/systems/MonobehaviorManager.h"         "src/systems/MonobehaviorManager.cpp" 
+"include/systems/MonobehaviorManager.h"         "src/scripts/MonobehaviorManager.cpp" 
 
 "include/scripts/CameraController.h"            "src/scripts/CameraController.cpp" 
 
 "include/input/InputManager.h"                  "src/input/InputManager.cpp"
 
-"include/components/rendering/Light.hpp"        "src/components/rendering/Light.cpp"
+"include/components/rendering/Light.hpp"        
 
 "include/util/Debug.h"                          "src/util/Debug.cpp"  
 
- "include/components/rendering/Model.h"         "src/components/rendering/Model.cpp")
+ "include/components/rendering/Model.h"         "src/components/rendering/Model.cpp" "include/util/Time.h"  "include/systems/LightingManager.h" "src/systems/LightingManager.cpp" "src/systems/DayNightCycleLight.cpp" "include/scripts/DayNightLightCycle.h" "src/util/Time.cpp")
 # Link OpenGL (use opengl32.lib directly for Windows)
 if(WIN32)
     target_link_libraries(COMP3340GraphicsEngine2 opengl32.lib)

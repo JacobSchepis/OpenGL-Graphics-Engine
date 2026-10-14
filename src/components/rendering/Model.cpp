@@ -5,22 +5,17 @@
 
 #include <iostream>
 
-void Model::Draw(Shader* shader) {
-    for (auto& meshRenderer : meshRenderersVector)
-        meshRenderer.render(shader);
-}
-
-void Model::loadModel(std::string path)
+void Model::loadModel(std::string modelPath)
 {
     Assimp::Importer import;
-    const aiScene * scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+    const aiScene * scene = import.ReadFile(modelPath, aiProcess_Triangulate);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
         return;
     }
-    directory = path.substr(0, path.find_last_of('/'));
+    directory = modelPath.substr(0, modelPath.find_last_of('/'));
 
     processNode(scene->mRootNode, scene);
 }
@@ -31,7 +26,11 @@ void Model::processNode(aiNode* node, const aiScene* scene)
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        meshRenderersVector.push_back(processMesh(mesh, scene));
+
+        std::vector<MeshRenderer> subMeshRenderers = processMesh(mesh, scene);
+
+        // Append the subMeshRenderers into meshRenderersVector
+        meshRenderersVector.insert(meshRenderersVector.end(), subMeshRenderers.begin(), subMeshRenderers.end());
     }
     // then do the same for each of its children
     for (unsigned int i = 0; i < node->mNumChildren; i++)
@@ -40,17 +39,23 @@ void Model::processNode(aiNode* node, const aiScene* scene)
     }
 }
 
-MeshRenderer Model::processMesh(aiMesh* mesh, const aiScene* scene)
+std::vector<MeshRenderer> Model::processMesh(aiMesh* mesh, const aiScene* scene)
 {
+    //std::cout << "processing new mesh" << std::endl;
+
+
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
-    std::vector<Texture> textures;
+    std::vector<MeshRenderer> meshRenderers;
 
+    // Process vertices as usual
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
-        Vertex vertex;
 
+        Vertex vertex;
         glm::vec3 vector;
+
+        // Process position, normals, and texture coordinates
         vector.x = mesh->mVertices[i].x;
         vector.y = mesh->mVertices[i].y;
         vector.z = mesh->mVertices[i].z;
@@ -74,6 +79,7 @@ MeshRenderer Model::processMesh(aiMesh* mesh, const aiScene* scene)
         vertices.push_back(vertex);
     }
 
+    // Process indices
     for (unsigned int i = 0; i < mesh->mNumFaces; i++)
     {
         aiFace face = mesh->mFaces[i];
@@ -81,39 +87,9 @@ MeshRenderer Model::processMesh(aiMesh* mesh, const aiScene* scene)
             indices.push_back(face.mIndices[j]);
     }
 
-    // process material
-    if (mesh->mMaterialIndex >= 0)
-    {
-        aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-        std::vector<Texture> diffuseMaps = loadMaterialTextures(material,
-            aiTextureType_DIFFUSE, "texture_diffuse");
-        textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+    MeshRenderer newMeshRenderer = MeshRenderer(Mesh(vertices, indices), Material(directory)); 
+    meshRenderers.push_back(newMeshRenderer); 
 
-        std::vector<Texture> specularMaps = loadMaterialTextures(material,
-            aiTextureType_SPECULAR, "texture_specular");
-        textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-    }
-
-     
-    
-    MeshRenderer newMeshRenderer = MeshRenderer(Mesh(vertices, indices), textures);
-
-    return newMeshRenderer;
-}
-
-std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
-{
-    std::vector<Texture> textures;
-    for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
-    {
-        aiString str;
-        mat->GetTexture(type, i, &str);
-        Texture texture;
-        texture.loadTextureFromFile(str.C_Str());
-        texture.type = typeName;
-        texture.path = str;
-        textures.push_back(texture);
-    }
-    return textures;
+    return meshRenderers;
 }

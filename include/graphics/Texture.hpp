@@ -4,25 +4,27 @@
 #include <string>
 #include <iostream>
 #include <assimp/scene.h>
+
 #include <stb_image.h>
 
 
 struct Texture {
 	GLuint id;
 	std::string type;
-	aiString path;
 
-    void loadTextureFromFile(const std::string& path) {
+    Texture(std::string& path) {
 
-        std::string filePath = "../../../resources/models/backpack/" + path;
+        path.erase(0, 9);
+
+        //or use path = "../" + path if you're too far ahead
 
         GLuint textureId;
         glGenTextures(1, &textureId);
         glBindTexture(GL_TEXTURE_2D, textureId);
 
         int width, height, nrChannels;
-        unsigned char* data = stbi_load(filePath.c_str(), &width, &height, &nrChannels, 0);
-        std::cout << filePath << std::endl;
+        unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
+
         if (data) {
             GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
             glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
@@ -32,6 +34,7 @@ struct Texture {
         else {
             std::string failureReason = stbi_failure_reason();
             std::cerr << "Failed to load texture: " << failureReason << std::endl;
+            std::cout << path << std::endl;
         }
 
         stbi_image_free(data);
